@@ -9,6 +9,12 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![React Icons](https://img.shields.io/badge/React_Icons-5.x-E91E63?style=flat-square&logo=react&logoColor=white)](https://react-icons.github.io/react-icons/)
 
+### 🚀 Deploy
+
+[![Vercel](https://img.shields.io/badge/Deploy-Vercel-black?style=for-the-badge&logo=vercel)](https://teste-nemu-frontend.vercel.app)
+
+**URL de Produção:** [https://teste-nemu-frontend.vercel.app](https://teste-nemu-frontend.vercel.app)
+
 </div>
 
 ---

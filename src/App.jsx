@@ -6,6 +6,8 @@ import { MdError, MdSettings, MdNavigateBefore, MdNavigateNext, MdClose, MdViewL
 import './styles/globals.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+console.log('🔍 API_BASE_URL:', API_BASE_URL);
+console.log('🔍 VITE_API_BASE_URL:', import.meta.env.VITE_API_BASE_URL);
 const ITEMS_PER_PAGE = 20;
 
 const CHANNEL_COLORS = {

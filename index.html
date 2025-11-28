@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="pt-BR" class="">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Análise de Jornada - Nemu</title>
+    <script>
+      // Inicializar tema antes de qualquer renderização para evitar flash
+      (function() {
+        try {
+          const stored = localStorage.getItem('theme');
+          const theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+          console.log('Initializing theme:', theme, 'from storage:', stored);
+          
+          if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+            console.log('Dark mode class added to HTML element');
+          } else {
+            document.documentElement.classList.remove('dark');
+            console.log('Dark mode class removed from HTML element');
+          }
+          
+          // Garantir que o tema está no localStorage
+          localStorage.setItem('theme', theme);
+        } catch (error) {
+          console.error('Error initializing theme:', error);
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

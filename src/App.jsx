@@ -255,21 +255,14 @@ function App() {
         <div className="relative z-10">
           <header className="border-b border-gray-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/90 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-4 py-4 md:py-6">
-            {/* Toggle de tema - mobile no topo direito, desktop integrado */}
-            <div className="flex justify-end mb-3 md:hidden">
-              <ThemeToggle />
-            </div>
-            
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex-1 pr-4 md:pr-0">
-                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white leading-tight">
-                  Análise de Jornada do Usuário
-                </h1>
-                <p className="text-sm md:text-base text-gray-700 dark:text-gray-300 mt-1">
+            <div className="mb-4">
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white leading-tight">
+                Análise de Jornada do Usuário
+              </h1>
+              <div className="flex items-start justify-between gap-4 mt-1">
+                <p className="text-sm md:text-base text-gray-700 dark:text-gray-300 flex-1">
                   Rastreie e analise interações de pontos de contato do usuário em diversos canais
                 </p>
-              </div>
-              <div className="hidden md:block">
                 <ThemeToggle />
               </div>
             </div>

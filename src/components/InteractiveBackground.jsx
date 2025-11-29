@@ -18,8 +18,9 @@ export default function InteractiveBackground() {
     let particles = [];
 
     const resize = () => {
+      const parent = canvas.parentElement;
       canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      canvas.height = Math.max(window.innerHeight, parent?.scrollHeight || 0);
     };
 
     resize();
@@ -86,9 +87,19 @@ export default function InteractiveBackground() {
 
     animate();
 
+    // Observer para redimensionar quando o conteúdo mudar
+    const resizeObserver = new ResizeObserver(() => {
+      resize();
+    });
+    
+    if (canvas.parentElement) {
+      resizeObserver.observe(canvas.parentElement);
+    }
+
     return () => {
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener('resize', resize);
+      resizeObserver.disconnect();
     };
   }, []);
 

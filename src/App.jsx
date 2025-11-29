@@ -247,19 +247,25 @@ function App() {
   const paginatedJourneys = sortedJourneys.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 transition-colors duration-300 relative">
-      <InteractiveBackground />
-      <ThemeToggle />
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 transition-colors duration-300 flex flex-col">
       
-      <div className="relative z-10">
-        <header className="border-b border-gray-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/90 backdrop-blur-sm">
+      <div className="flex-1 relative">
+        <InteractiveBackground />
+        
+        <div className="relative z-10">
+          <header className="border-b border-gray-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/90 backdrop-blur-sm sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-4 py-6">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Análise de Jornada do Usuário
-            </h1>
-            <p className="text-gray-700 dark:text-gray-300 mt-1">
-              Rastreie e analise interações de pontos de contato do usuário em diversos canais
-            </p>
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex-1">
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                  Análise de Jornada do Usuário
+                </h1>
+                <p className="text-gray-700 dark:text-gray-300 mt-1">
+                  Rastreie e analise interações de pontos de contato do usuário em diversos canais
+                </p>
+              </div>
+              <ThemeToggle />
+            </div>
             
             <div className="mt-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 flex gap-3">
               <MdInfo className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
@@ -274,6 +280,13 @@ function App() {
                   </p>
                 </div>
               </div>
+            </div>
+
+            <div className="mt-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3 flex gap-3 md:hidden">
+              <MdInfo className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-amber-800 dark:text-amber-400">
+                <span className="font-medium">📱 Dica para Mobile:</span> Recomendamos usar a visualização em <span className="font-semibold">Cards</span> para melhor experiência em dispositivos móveis.
+              </p>
             </div>
 
             <div className="mt-4">
@@ -682,6 +695,7 @@ function App() {
             </>
           )}
         </main>
+        </div>
       </div>
 
       <Footer />

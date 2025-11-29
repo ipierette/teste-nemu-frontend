@@ -129,7 +129,6 @@ function App() {
   const [modalJourney, setModalJourney] = useState(null);
   const [modalCompleteJourney, setModalCompleteJourney] = useState(null);
   const [modalVisibleCount, setModalVisibleCount] = useState(100);
-  const [originalModalVisibleCount, setOriginalModalVisibleCount] = useState(100);
   const [viewMode, setViewMode] = useState('table');
   const [showStats, setShowStats] = useState(true);
   const [sortOrder, setSortOrder] = useState('desc');
@@ -200,19 +199,6 @@ function App() {
   const closeJourneyModal = () => {
     setModalJourney(null);
     setModalVisibleCount(100);
-  };
-
-  const openCompleteJourneyModal = (sessionId) => {
-    const fullJourney = journeys.find(j => j.sessionId === sessionId);
-    if (fullJourney) {
-      setModalCompleteJourney(fullJourney);
-      setOriginalModalVisibleCount(100); // Reset ao abrir
-    }
-  };
-
-  const closeCompleteJourneyModal = () => {
-    setModalCompleteJourney(null);
-    setOriginalModalVisibleCount(100);
   };
 
   const calculateStats = () => {
@@ -493,13 +479,6 @@ function App() {
                                 Ver mais ({journey.path.length} canais)
                               </button>
                             )}
-                            <button
-                              onClick={() => openCompleteJourneyModal(journey.sessionId)}
-                              className={`px-3 py-2 text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded hover:bg-green-200 dark:hover:bg-green-800 transition-colors font-medium ${!shouldTruncate ? 'flex-1' : ''}`}
-                              title="Visualizar jornada original sem nenhum tratamento"
-                            >
-                              Dados originais
-                            </button>
                           </div>
                         </div>
                       </div>
@@ -616,13 +595,6 @@ function App() {
                                     Ver mais ({journey.path.length})
                                   </button>
                                 )}
-                                <button
-                                  onClick={() => openCompleteJourneyModal(journey.sessionId)}
-                                  className="ml-2 px-2 py-1 text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded hover:bg-green-200 dark:hover:bg-green-800 transition-colors"
-                                  title="Visualizar jornada original sem nenhum tratamento"
-                                >
-                                  Dados originais
-                                </button>
                               </div>
                             </td>
                           )}
@@ -779,95 +751,6 @@ function App() {
               <button
                 onClick={closeJourneyModal}
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-              >
-                Fechar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {modalCompleteJourney && (
-        <div 
-          className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50 p-4"
-          onClick={closeCompleteJourneyModal}
-        >
-          <div 
-            className="bg-white dark:bg-slate-900 rounded-lg shadow-2xl max-w-3xl w-full max-h-[80vh] flex flex-col"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-slate-700">
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                  Jornada Completa (Original)
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  {(modalCompleteJourney.originalTouchpoints?.length || 0)} touchpoints • ID: {modalCompleteJourney.sessionId}
-                </p>
-                <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
-                  ⚠️ Dados brutos sem tratamento de duplicatas
-                </p>
-                {(modalCompleteJourney.originalTouchpoints?.length || 0) > 1000 && (
-                  <p className="text-xs text-green-600 dark:text-green-400 mt-1">
-                    ⚡ Virtualização ativada - performance otimizada
-                  </p>
-                )}
-              </div>
-              <button
-                onClick={closeCompleteJourneyModal}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors"
-              >
-                <MdClose className="w-6 h-6 text-gray-600 dark:text-gray-400" />
-              </button>
-            </div>
-            
-            <div className="overflow-y-auto p-6 flex-1">
-              {/* Renderização otimizada com lazy loading para dados originais */}
-              {modalCompleteJourney.originalTouchpoints && modalCompleteJourney.originalTouchpoints.length > 0 ? (
-                <>
-                  <div className="flex flex-wrap gap-3">
-                    {modalCompleteJourney.originalTouchpoints.slice(0, originalModalVisibleCount).map((touchpoint, tIdx) => (
-                      <div key={`complete-${touchpoint.channel}-${tIdx}`} className="flex items-center gap-2">
-                        <span className={`px-3 py-1.5 rounded-full text-sm font-medium ${getChannelColor(touchpoint.channel)}`}>
-                          {touchpoint.channel}
-                        </span>
-                        {tIdx < modalCompleteJourney.originalTouchpoints.length - 1 && (
-                          <span className="text-gray-400 dark:text-gray-600 text-lg">→</span>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                  
-                  {modalCompleteJourney.originalTouchpoints.length > originalModalVisibleCount && (
-                    <div className="mt-4 text-center">
-                      <button
-                        onClick={() => setOriginalModalVisibleCount(prev => Math.min(prev + 200, modalCompleteJourney.originalTouchpoints.length))}
-                        className="px-4 py-2 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors text-sm font-medium"
-                      >
-                        ⚡ Carregar mais {Math.min(200, modalCompleteJourney.originalTouchpoints.length - originalModalVisibleCount)} touchpoints
-                      </button>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                        Mostrando {originalModalVisibleCount} de {modalCompleteJourney.originalTouchpoints.length}
-                      </p>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-gray-600 dark:text-gray-400 mb-2">
-                    ⚠️ Dados originais não disponíveis
-                  </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-500">
-                    O backend pode estar usando uma versão antiga. Tente recarregar a página.
-                  </p>
-                </div>
-              )}
-            </div>
-            
-            <div className="p-4 border-t border-gray-200 dark:border-slate-700 flex justify-end">
-              <button
-                onClick={closeCompleteJourneyModal}
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
               >
                 Fechar
               </button>

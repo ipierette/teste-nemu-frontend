@@ -477,8 +477,8 @@ function App() {
                               </div>
                             ))}
                           </div>
-                          {shouldTruncate && (
-                            <div className="mt-3 flex gap-2">
+                          <div className="mt-3 flex gap-2">
+                            {shouldTruncate && (
                               <button
                                 onClick={() => openJourneyModal(journey)}
                                 className="flex-1 px-3 py-2 text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors font-medium"
@@ -486,15 +486,15 @@ function App() {
                               >
                                 Ver mais ({journey.path.length} canais)
                               </button>
-                              <button
-                                onClick={() => openCompleteJourneyModal(journey.sessionId)}
-                                className="px-3 py-2 text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded hover:bg-green-200 dark:hover:bg-green-800 transition-colors font-medium"
-                                title="Visualizar jornada original sem nenhum tratamento"
-                              >
-                                Dados originais
-                              </button>
-                            </div>
-                          )}
+                            )}
+                            <button
+                              onClick={() => openCompleteJourneyModal(journey.sessionId)}
+                              className={`px-3 py-2 text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded hover:bg-green-200 dark:hover:bg-green-800 transition-colors font-medium ${!shouldTruncate ? 'flex-1' : ''}`}
+                              title="Visualizar jornada original sem nenhum tratamento"
+                            >
+                              Dados originais
+                            </button>
+                          </div>
                         </div>
                       </div>
                     );
@@ -602,23 +602,21 @@ function App() {
                                   </div>
                                 ))}
                                 {shouldTruncate && (
-                                  <>
-                                    <button
-                                      onClick={() => openJourneyModal(journey)}
-                                      className="ml-2 px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
-                                      title="Exibir todos os touchpoints tratados (com remoção de duplicatas)"
-                                    >
-                                      Ver mais ({journey.path.length})
-                                    </button>
-                                    <button
-                                      onClick={() => openCompleteJourneyModal(journey.sessionId)}
-                                      className="ml-2 px-2 py-1 text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded hover:bg-green-200 dark:hover:bg-green-800 transition-colors"
-                                      title="Visualizar jornada original sem nenhum tratamento"
-                                    >
-                                      Dados originais
-                                    </button>
-                                  </>
+                                  <button
+                                    onClick={() => openJourneyModal(journey)}
+                                    className="ml-2 px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
+                                    title="Exibir todos os touchpoints tratados (com remoção de duplicatas)"
+                                  >
+                                    Ver mais ({journey.path.length})
+                                  </button>
                                 )}
+                                <button
+                                  onClick={() => openCompleteJourneyModal(journey.sessionId)}
+                                  className="ml-2 px-2 py-1 text-xs bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded hover:bg-green-200 dark:hover:bg-green-800 transition-colors"
+                                  title="Visualizar jornada original sem nenhum tratamento"
+                                >
+                                  Dados originais
+                                </button>
                               </div>
                             </td>
                           )}

@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { ThemeToggle } from './components/ThemeToggle';
 import Footer from './components/Footer';
-import InteractiveBackground from './components/InteractiveBackground';
 import { MdError, MdSettings, MdNavigateBefore, MdNavigateNext, MdClose, MdViewList, MdViewModule, MdAttachMoney, MdShoppingCart, MdTrendingUp, MdAccessTime, MdArrowUpward, MdArrowDownward, MdInfo } from 'react-icons/md';
 import './styles/globals.css';
 
@@ -253,8 +252,7 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 transition-colors duration-300 flex flex-col">
       
-      <div className="flex-1 relative">
-        <InteractiveBackground />
+      <div className="flex-1 relative bg-gradient-to-br from-blue-50/30 via-gray-50 to-indigo-50/40 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950/30">
         
         <div className="relative z-10">
           <header className="border-b border-gray-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/90 backdrop-blur-sm">

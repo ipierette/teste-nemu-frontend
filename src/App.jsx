@@ -155,24 +155,25 @@ function App() {
     }
   };
 
-  function groupJourneysByPath(data) {
-    return data.map(journey => ({
-      sessionId: journey.sessionId,
-      createdAt: journey.startTime,
-      path: journey.touchpoints,
-      totalValue: Math.random() * 1000000,
-      sales: Math.floor(Math.random() * 5000),
-      totalDuration: journey.duration,
-      journeyCount: 1,
-      touchpointCount: journey.touchpoints.length,
-      avgTicket: 0,
-      avgDuration: journey.duration,
-      percentage: 0
-    })).map(journey => ({
-      ...journey,
-      avgTicket: journey.totalValue / journey.sales
-    })).sort((a, b) => b.totalValue - a.totalValue);
-  }
+  const groupJourneysByPath = useMemo(() => (data) => {
+    return data.map(journey => {
+      const totalValue = Math.random() * 1000000;
+      const sales = Math.floor(Math.random() * 5000);
+      return {
+        sessionId: journey.sessionId,
+        createdAt: journey.startTime,
+        path: journey.touchpoints,
+        totalValue,
+        sales,
+        totalDuration: journey.duration,
+        journeyCount: 1,
+        touchpointCount: journey.touchpoints.length,
+        avgTicket: totalValue / sales,
+        avgDuration: journey.duration,
+        percentage: 0
+      };
+    }).sort((a, b) => b.totalValue - a.totalValue);
+  }, []);
 
   useEffect(() => {
     loadJourneys();
@@ -236,11 +237,14 @@ function App() {
     }));
   }, [filteredJourneys]);
 
-  const sortedJourneys = [...processedJourneys].sort((a, b) => {
-    const dateA = new Date(a.createdAt).getTime();
-    const dateB = new Date(b.createdAt).getTime();
-    return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
-  });
+  // Memoização: ordena apenas quando necessário
+  const sortedJourneys = useMemo(() => {
+    return [...processedJourneys].sort((a, b) => {
+      const dateA = new Date(a.createdAt).getTime();
+      const dateB = new Date(b.createdAt).getTime();
+      return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+    });
+  }, [processedJourneys, sortOrder]);
 
   const totalPages = Math.ceil(sortedJourneys.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -255,16 +259,16 @@ function App() {
         <div className="relative z-10">
           <header className="border-b border-gray-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/90 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-4 py-4 md:py-6">
-            <div className="mb-4">
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white leading-tight">
-                Análise de Jornada do Usuário
-              </h1>
-              <div className="flex items-start justify-between gap-4 mt-1">
-                <p className="text-sm md:text-base text-gray-700 dark:text-gray-300 flex-1">
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <div className="flex-1">
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white leading-tight">
+                  Análise de Jornada do Usuário
+                </h1>
+                <p className="text-sm md:text-base text-gray-700 dark:text-gray-300 mt-1">
                   Rastreie e analise interações de pontos de contato do usuário em diversos canais
                 </p>
-                <ThemeToggle />
               </div>
+              <ThemeToggle />
             </div>
             
             <div className="mt-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 flex gap-3">

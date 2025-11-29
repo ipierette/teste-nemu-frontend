@@ -232,15 +232,6 @@ function App() {
 
   const stats = journeys.length > 0 ? calculateStats() : null;
 
-  // Memoização: processa jornadas apenas quando mudam
-  const processedJourneys = useMemo(() => {
-    return filteredJourneys.map(journey => ({
-      ...journey,
-      displayPath: journey.path?.slice(0, 5) || [],
-      shouldTruncate: (journey.path?.length || 0) > 5
-    }));
-  }, [filteredJourneys]);
-
   const toggleSortOrder = () => {
     setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
   };
@@ -249,6 +240,15 @@ function App() {
     if (!searchTerm.trim()) return true;
     return journey.sessionId?.toLowerCase().includes(searchTerm.toLowerCase());
   });
+
+  // Memoização: processa jornadas apenas quando mudam
+  const processedJourneys = useMemo(() => {
+    return filteredJourneys.map(journey => ({
+      ...journey,
+      displayPath: journey.path?.slice(0, 5) || [],
+      shouldTruncate: (journey.path?.length || 0) > 5
+    }));
+  }, [filteredJourneys]);
 
   const sortedJourneys = [...processedJourneys].sort((a, b) => {
     const dateA = new Date(a.createdAt).getTime();

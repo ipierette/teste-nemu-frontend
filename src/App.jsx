@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { FixedSizeList as List } from 'react-window';
 import { ThemeToggle } from './components/ThemeToggle';
 import Footer from './components/Footer';
 import InteractiveBackground from './components/InteractiveBackground';
@@ -128,6 +129,8 @@ function App() {
   });
   const [modalJourney, setModalJourney] = useState(null);
   const [modalCompleteJourney, setModalCompleteJourney] = useState(null);
+  const [modalVisibleCount, setModalVisibleCount] = useState(100);
+  const [originalModalVisibleCount, setOriginalModalVisibleCount] = useState(100);
   const [viewMode, setViewMode] = useState('table');
   const [showStats, setShowStats] = useState(true);
   const [sortOrder, setSortOrder] = useState('desc');
@@ -192,30 +195,25 @@ function App() {
 
   const openJourneyModal = (journey) => {
     setModalJourney(journey);
+    setModalVisibleCount(100); // Reset ao abrir
   };
 
   const closeJourneyModal = () => {
     setModalJourney(null);
+    setModalVisibleCount(100);
   };
 
-  const openCompleteJourneyModal = async (sessionId) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/journeys`);
-      const data = await response.json();
-      
-      if (data.success) {
-        const fullJourney = data.data.find(j => j.sessionId === sessionId);
-        if (fullJourney) {
-          setModalCompleteJourney(fullJourney);
-        }
-      }
-    } catch (error) {
-      console.error('Erro ao buscar jornada completa:', error);
+  const openCompleteJourneyModal = (sessionId) => {
+    const fullJourney = journeys.find(j => j.sessionId === sessionId);
+    if (fullJourney) {
+      setModalCompleteJourney(fullJourney);
+      setOriginalModalVisibleCount(100); // Reset ao abrir
     }
   };
 
   const closeCompleteJourneyModal = () => {
     setModalCompleteJourney(null);
+    setOriginalModalVisibleCount(100);
   };
 
   const calculateStats = () => {
@@ -235,6 +233,15 @@ function App() {
 
   const stats = journeys.length > 0 ? calculateStats() : null;
 
+  // Memoização: processa jornadas apenas quando mudam
+  const processedJourneys = useMemo(() => {
+    return filteredJourneys.map(journey => ({
+      ...journey,
+      displayPath: journey.path?.slice(0, 5) || [],
+      shouldTruncate: (journey.path?.length || 0) > 5
+    }));
+  }, [filteredJourneys]);
+
   const toggleSortOrder = () => {
     setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
   };
@@ -244,7 +251,7 @@ function App() {
     return journey.sessionId?.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
-  const sortedJourneys = [...filteredJourneys].sort((a, b) => {
+  const sortedJourneys = [...processedJourneys].sort((a, b) => {
     const dateA = new Date(a.createdAt).getTime();
     const dateB = new Date(b.createdAt).getTime();
     return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
@@ -725,6 +732,11 @@ function App() {
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                   {modalJourney.path.length} touchpoints • ID: {modalJourney.sessionId}
                 </p>
+                {modalJourney.path.length > 1000 && (
+                  <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                    ⚡ Jornada grande - usando virtualização para melhor performance
+                  </p>
+                )}
               </div>
               <button
                 onClick={closeJourneyModal}
@@ -735,18 +747,68 @@ function App() {
             </div>
             
             <div className="overflow-y-auto p-6 flex-1">
-              <div className="flex flex-wrap gap-3">
-                {modalJourney.path.map((touchpoint, tIdx) => (
-                  <div key={`modal-${touchpoint.channel}-${tIdx}`} className="flex items-center gap-2">
-                    <span className={`px-3 py-1.5 rounded-full text-sm font-medium ${getChannelColor(touchpoint.channel)}`}>
-                      {touchpoint.channel}
-                    </span>
-                    {tIdx < modalJourney.path.length - 1 && (
-                      <span className="text-gray-400 dark:text-gray-600 text-lg">→</span>
-                    )}
-                  </div>
-                ))}
-              </div>
+              {modalJourney.path.length > 1000 ? (
+                // Virtualização para jornadas grandes (>1000 touchpoints)
+                <List
+                  height={400}
+                  itemCount={Math.ceil(modalJourney.path.length / 5)}
+                  itemSize={60}
+                  width="100%"
+                  className="scrollbar-thin"
+                >
+                  {({ index, style }) => {
+                    const startIdx = index * 5;
+                    const endIdx = Math.min(startIdx + 5, modalJourney.path.length);
+                    const rowItems = modalJourney.path.slice(startIdx, endIdx);
+                    
+                    return (
+                      <div style={style} className="flex flex-wrap gap-3 items-center">
+                        {rowItems.map((touchpoint, tIdx) => {
+                          const globalIdx = startIdx + tIdx;
+                          return (
+                            <div key={`modal-${globalIdx}`} className="flex items-center gap-2">
+                              <span className={`px-3 py-1.5 rounded-full text-sm font-medium ${getChannelColor(touchpoint.channel)}`}>
+                                {touchpoint.channel}
+                              </span>
+                              {globalIdx < modalJourney.path.length - 1 && (
+                                <span className="text-gray-400 dark:text-gray-600 text-lg">→</span>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  }}
+                </List>
+              ) : (
+                // Renderização normal para jornadas pequenas
+                <div className="flex flex-wrap gap-3">
+                  {modalJourney.path.slice(0, modalVisibleCount).map((touchpoint, tIdx) => (
+                    <div key={`modal-${touchpoint.channel}-${tIdx}`} className="flex items-center gap-2">
+                      <span className={`px-3 py-1.5 rounded-full text-sm font-medium ${getChannelColor(touchpoint.channel)}`}>
+                        {touchpoint.channel}
+                      </span>
+                      {tIdx < modalJourney.path.length - 1 && (
+                        <span className="text-gray-400 dark:text-gray-600 text-lg">→</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {modalJourney.path.length > modalVisibleCount && modalJourney.path.length <= 1000 && (
+                <div className="mt-4 text-center">
+                  <button
+                    onClick={() => setModalVisibleCount(prev => Math.min(prev + 100, modalJourney.path.length))}
+                    className="px-4 py-2 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors text-sm"
+                  >
+                    Carregar mais {Math.min(100, modalJourney.path.length - modalVisibleCount)} touchpoints
+                  </button>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                    Mostrando {modalVisibleCount} de {modalJourney.path.length}
+                  </p>
+                </div>
+              )}
             </div>
             
             <div className="p-4 border-t border-gray-200 dark:border-slate-700 flex justify-end">
@@ -776,11 +838,16 @@ function App() {
                   Jornada Completa (Original)
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  {modalCompleteJourney.touchpoints.length} touchpoints • ID: {modalCompleteJourney.sessionId}
+                  {modalCompleteJourney.originalTouchpoints.length} touchpoints • ID: {modalCompleteJourney.sessionId}
                 </p>
                 <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
                   ⚠️ Dados brutos sem tratamento de duplicatas
                 </p>
+                {modalCompleteJourney.originalTouchpoints.length > 1000 && (
+                  <p className="text-xs text-green-600 dark:text-green-400 mt-1">
+                    ⚡ Virtualização ativada - performance otimizada
+                  </p>
+                )}
               </div>
               <button
                 onClick={closeCompleteJourneyModal}
@@ -791,18 +858,68 @@ function App() {
             </div>
             
             <div className="overflow-y-auto p-6 flex-1">
-              <div className="flex flex-wrap gap-3">
-                {modalCompleteJourney.touchpoints.map((touchpoint, tIdx) => (
-                  <div key={`complete-${touchpoint.channel}-${tIdx}`} className="flex items-center gap-2">
-                    <span className={`px-3 py-1.5 rounded-full text-sm font-medium ${getChannelColor(touchpoint.channel)}`}>
-                      {touchpoint.channel}
-                    </span>
-                    {tIdx < modalCompleteJourney.touchpoints.length - 1 && (
-                      <span className="text-gray-400 dark:text-gray-600 text-lg">→</span>
-                    )}
-                  </div>
-                ))}
-              </div>
+              {modalCompleteJourney.originalTouchpoints.length > 1000 ? (
+                // Virtualização para jornadas gigantes (>1000 touchpoints)
+                <List
+                  height={400}
+                  itemCount={Math.ceil(modalCompleteJourney.originalTouchpoints.length / 5)}
+                  itemSize={60}
+                  width="100%"
+                  className="scrollbar-thin"
+                >
+                  {({ index, style }) => {
+                    const startIdx = index * 5;
+                    const endIdx = Math.min(startIdx + 5, modalCompleteJourney.originalTouchpoints.length);
+                    const rowItems = modalCompleteJourney.originalTouchpoints.slice(startIdx, endIdx);
+                    
+                    return (
+                      <div style={style} className="flex flex-wrap gap-3 items-center">
+                        {rowItems.map((touchpoint, tIdx) => {
+                          const globalIdx = startIdx + tIdx;
+                          return (
+                            <div key={`complete-${globalIdx}`} className="flex items-center gap-2">
+                              <span className={`px-3 py-1.5 rounded-full text-sm font-medium ${getChannelColor(touchpoint.channel)}`}>
+                                {touchpoint.channel}
+                              </span>
+                              {globalIdx < modalCompleteJourney.originalTouchpoints.length - 1 && (
+                                <span className="text-gray-400 dark:text-gray-600 text-lg">→</span>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  }}
+                </List>
+              ) : (
+                // Renderização normal para jornadas pequenas
+                <div className="flex flex-wrap gap-3">
+                  {modalCompleteJourney.originalTouchpoints.slice(0, originalModalVisibleCount).map((touchpoint, tIdx) => (
+                    <div key={`complete-${touchpoint.channel}-${tIdx}`} className="flex items-center gap-2">
+                      <span className={`px-3 py-1.5 rounded-full text-sm font-medium ${getChannelColor(touchpoint.channel)}`}>
+                        {touchpoint.channel}
+                      </span>
+                      {tIdx < modalCompleteJourney.originalTouchpoints.length - 1 && (
+                        <span className="text-gray-400 dark:text-gray-600 text-lg">→</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {modalCompleteJourney.originalTouchpoints.length > originalModalVisibleCount && modalCompleteJourney.originalTouchpoints.length <= 1000 && (
+                <div className="mt-4 text-center">
+                  <button
+                    onClick={() => setOriginalModalVisibleCount(prev => Math.min(prev + 100, modalCompleteJourney.originalTouchpoints.length))}
+                    className="px-4 py-2 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors text-sm"
+                  >
+                    Carregar mais {Math.min(100, modalCompleteJourney.originalTouchpoints.length - originalModalVisibleCount)} touchpoints
+                  </button>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                    Mostrando {originalModalVisibleCount} de {modalCompleteJourney.originalTouchpoints.length}
+                  </p>
+                </div>
+              )}
             </div>
             
             <div className="p-4 border-t border-gray-200 dark:border-slate-700 flex justify-end">

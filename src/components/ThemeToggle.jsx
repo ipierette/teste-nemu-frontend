@@ -40,15 +40,14 @@ export function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="fixed top-6 right-6 p-3 rounded-full bg-white dark:bg-slate-800 border-2 border-gray-300 dark:border-slate-600 hover:bg-gray-100 dark:hover:bg-slate-700 transition-all duration-200 shadow-lg hover:shadow-xl z-[9999]"
+      className="p-2.5 rounded-full bg-white dark:bg-slate-800 border-2 border-gray-300 dark:border-slate-600 hover:bg-gray-100 dark:hover:bg-slate-700 transition-all duration-200 shadow-md hover:shadow-lg flex-shrink-0"
       aria-label="Alternar tema"
-      style={{ zIndex: 9999 }}
       title={`Mudar para modo ${theme === 'dark' ? 'claro' : 'escuro'}`}
     >
       {theme === 'dark' ? (
-        <MdLightMode className="w-6 h-6 text-yellow-400" />
+        <MdLightMode className="w-5 h-5 text-yellow-400" />
       ) : (
-        <MdDarkMode className="w-6 h-6 text-gray-700" />
+        <MdDarkMode className="w-5 h-5 text-gray-700" />
       )}
     </button>
   );

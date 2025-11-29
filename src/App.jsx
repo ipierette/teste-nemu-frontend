@@ -802,12 +802,12 @@ function App() {
                   Jornada Completa (Original)
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  {modalCompleteJourney.originalTouchpoints.length} touchpoints • ID: {modalCompleteJourney.sessionId}
+                  {(modalCompleteJourney.originalTouchpoints?.length || 0)} touchpoints • ID: {modalCompleteJourney.sessionId}
                 </p>
                 <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
                   ⚠️ Dados brutos sem tratamento de duplicatas
                 </p>
-                {modalCompleteJourney.originalTouchpoints.length > 1000 && (
+                {(modalCompleteJourney.originalTouchpoints?.length || 0) > 1000 && (
                   <p className="text-xs text-green-600 dark:text-green-400 mt-1">
                     ⚡ Virtualização ativada - performance otimizada
                   </p>
@@ -823,29 +823,42 @@ function App() {
             
             <div className="overflow-y-auto p-6 flex-1">
               {/* Renderização otimizada com lazy loading para dados originais */}
-              <div className="flex flex-wrap gap-3">
-                {modalCompleteJourney.originalTouchpoints.slice(0, originalModalVisibleCount).map((touchpoint, tIdx) => (
-                  <div key={`complete-${touchpoint.channel}-${tIdx}`} className="flex items-center gap-2">
-                    <span className={`px-3 py-1.5 rounded-full text-sm font-medium ${getChannelColor(touchpoint.channel)}`}>
-                      {touchpoint.channel}
-                    </span>
-                    {tIdx < modalCompleteJourney.originalTouchpoints.length - 1 && (
-                      <span className="text-gray-400 dark:text-gray-600 text-lg">→</span>
-                    )}
+              {modalCompleteJourney.originalTouchpoints && modalCompleteJourney.originalTouchpoints.length > 0 ? (
+                <>
+                  <div className="flex flex-wrap gap-3">
+                    {modalCompleteJourney.originalTouchpoints.slice(0, originalModalVisibleCount).map((touchpoint, tIdx) => (
+                      <div key={`complete-${touchpoint.channel}-${tIdx}`} className="flex items-center gap-2">
+                        <span className={`px-3 py-1.5 rounded-full text-sm font-medium ${getChannelColor(touchpoint.channel)}`}>
+                          {touchpoint.channel}
+                        </span>
+                        {tIdx < modalCompleteJourney.originalTouchpoints.length - 1 && (
+                          <span className="text-gray-400 dark:text-gray-600 text-lg">→</span>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-              
-              {modalCompleteJourney.originalTouchpoints.length > originalModalVisibleCount && (
-                <div className="mt-4 text-center">
-                  <button
-                    onClick={() => setOriginalModalVisibleCount(prev => Math.min(prev + 200, modalCompleteJourney.originalTouchpoints.length))}
-                    className="px-4 py-2 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors text-sm font-medium"
-                  >
-                    ⚡ Carregar mais {Math.min(200, modalCompleteJourney.originalTouchpoints.length - originalModalVisibleCount)} touchpoints
-                  </button>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                    Mostrando {originalModalVisibleCount} de {modalCompleteJourney.originalTouchpoints.length}
+                  
+                  {modalCompleteJourney.originalTouchpoints.length > originalModalVisibleCount && (
+                    <div className="mt-4 text-center">
+                      <button
+                        onClick={() => setOriginalModalVisibleCount(prev => Math.min(prev + 200, modalCompleteJourney.originalTouchpoints.length))}
+                        className="px-4 py-2 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors text-sm font-medium"
+                      >
+                        ⚡ Carregar mais {Math.min(200, modalCompleteJourney.originalTouchpoints.length - originalModalVisibleCount)} touchpoints
+                      </button>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                        Mostrando {originalModalVisibleCount} de {modalCompleteJourney.originalTouchpoints.length}
+                      </p>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="text-center py-8">
+                  <p className="text-gray-600 dark:text-gray-400 mb-2">
+                    ⚠️ Dados originais não disponíveis
+                  </p>
+                  <p className="text-sm text-gray-500 dark:text-gray-500">
+                    O backend pode estar usando uma versão antiga. Tente recarregar a página.
                   </p>
                 </div>
               )}

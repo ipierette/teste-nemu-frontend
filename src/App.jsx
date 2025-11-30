@@ -255,29 +255,29 @@ function App() {
       <div className="flex-1 relative bg-gradient-to-br from-blue-50/30 via-gray-50 to-indigo-50/40 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950/30">
         
         <div className="relative z-10">
-          <header className="border-b border-gray-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/90 backdrop-blur-sm">
+          <header className="border-b border-gray-800 bg-[#1a1a1a]">
           <div className="max-w-7xl mx-auto px-4 py-4 md:py-6">
             <div className="flex items-start justify-between gap-4 mb-4">
               <div className="flex-1">
-                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white leading-tight">
+                <h1 className="text-2xl md:text-3xl font-bold text-white leading-tight">
                   Análise de Jornada do Usuário
                 </h1>
-                <p className="text-sm md:text-base text-gray-700 dark:text-gray-300 mt-1">
+                <p className="text-sm md:text-base text-gray-300 mt-1">
                   Rastreie e analise interações de pontos de contato do usuário em diversos canais
                 </p>
               </div>
               <ThemeToggle />
             </div>
             
-            <div className="mt-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 flex gap-3">
-              <MdInfo className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+            <div className="mt-4 bg-blue-900/30 border border-blue-700/50 rounded-lg p-3 flex gap-3">
+              <MdInfo className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
               <div className="text-sm">
-                <p className="font-semibold text-blue-900 dark:text-blue-300 mb-2">Sobre os dados exibidos</p>
+                <p className="font-semibold text-blue-300 mb-2">Sobre os dados exibidos</p>
                 <div className="space-y-1">
-                  <p className="text-blue-800 dark:text-blue-400">
+                  <p className="text-blue-300">
                     <span className="font-medium">📊 Dados da Tabela (reais):</span> ID, Criado Em, Jornada (touchpoints), Touchpoints
                   </p>
-                  <p className="text-blue-800 dark:text-blue-400">
+                  <p className="text-blue-300">
                     <span className="font-medium">📈 Estatísticas e tabela (simuladas/mock):</span> Valor Total, Ticket Médio, Vendas, Tempo de Conversão, Quantidade de Jornadas, % Quantidade
                   </p>
                 </div>
